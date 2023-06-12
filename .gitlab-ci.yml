@@ -18,7 +18,8 @@ cache:
     - .m2/repository
 
 before_script:
-  - apk add docker-cli
+  - apt-get update
+  - apt-get install -y docker.io
 
 build:
   stage: build
