@@ -1,5 +1,11 @@
 image: maven:3.8.3-openjdk-17
 
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://localhost:2375
+
+
 stages:
   - build
   - docker_build
