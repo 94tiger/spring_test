@@ -1,0 +1,48 @@
+image: maven:3.8.1-jdk-11
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
+  PACKAGE_NAME: kms-test
+  REGISTRY_NAME: platformsi
+  K8S_NAMESPACE: gitlab-agent-platformsi
+  KUBECONFIG: /root/.kube/config
+
+services:
+  - docker:dind
+
+before_script:
+  - mvn --version
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - build
+  - package
+  - deploy
+
+mvn-build:
+  stage: build
+  script:
+    - mvn clean package
+
+docker-build:
+  image: docker:latest
+  stage: package
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker --version
+    - docker build -t $CI_REGISTRY/$REGISTRY_NAME/$PACKAGE_NAME:latest .
+    - docker push $CI_REGISTRY/$REGISTRY_NAME/$PACKAGE_NAME:latest
+
+deploy:
+  stage: deploy
+  script:
+    - envsubst < k8s/kustomization.tmpl.yaml k8s/kustomization.yaml
+    - kubectl kustomize k8s | kubectl apply -f -
