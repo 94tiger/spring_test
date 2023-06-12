@@ -22,7 +22,7 @@ build:
 
 docker_build:
   stage: docker_build
-  image: docker:latest
+  image: docker
   services:
     - docker:dind
   script:
