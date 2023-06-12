@@ -17,6 +17,9 @@ cache:
   paths:
     - .m2/repository
 
+before_script:
+  - apk add docker-cli
+
 build:
   stage: build
   script:
