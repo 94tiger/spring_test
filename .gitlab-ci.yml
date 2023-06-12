@@ -3,7 +3,7 @@ image: maven:3.8.3-openjdk-17
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_HOST: tcp://172.20:2375
 
 
 stages:
@@ -28,6 +28,7 @@ docker_build:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker --version
+    - ip addr
     - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
 
