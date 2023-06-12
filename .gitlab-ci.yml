@@ -29,6 +29,7 @@ docker_build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker --version
     - ip addr
+    - netstat -nlpt
     - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
 
