@@ -5,6 +5,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: tcp://localhost:2375
 
+
 stages:
   - build
   - docker_build
@@ -23,10 +24,7 @@ docker_build:
   stage: docker_build
   image: docker:latest
   services:
-    - name: docker:dind$CI_RUNNER_REVISION
-      alias: dind
-  variables:
-    DOCKER_HOST: tcp://dind:2375
+    - docker:dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t taewook/spring-boot-test .
@@ -37,3 +35,4 @@ deploy:
   image: bitnami/kubectl:latest
   script:
     - kubectl apply -f k8s-deployment.yaml
+
