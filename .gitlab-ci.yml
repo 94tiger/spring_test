@@ -39,7 +39,7 @@ variables:
 
 stages:
   - build
-  - docker_build
+  - package
   - deploy
 
 cache:
