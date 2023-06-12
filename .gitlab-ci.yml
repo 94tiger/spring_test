@@ -1,49 +1,33 @@
-image: maven:3.8.1-openjdk-17
-
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  #DOCKER_HOST: tcp://docker:2375
-  DOCKER_HOST: unix:///var/run/cri-dockerd.sock
-  PACKAGE_NAME: kms-test
-  REGISTRY_NAME: platformsi
-  K8S_NAMESPACE: gitlab-agent-platformsi
-  KUBECONFIG: /root/.kube/config
-
-services:
-  - docker:dind
-
-before_script:
-  - mvn --version
-
-cache:
-  paths:
-    - .m2/repository
-
 stages:
   - build
+  - test
   - package
   - deploy
 
-mvn-build:
+build:
   stage: build
+  image: maven:3.8.1-jdk-17
   script:
-    - mvn clean package
+    - mvn clean compile
 
-docker-build:
-  image: docker:latest
-  stage: package
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+test:
+  stage: test
+  image: maven:3.8.1-jdk-17
   script:
-    - docker --version
-    - docker build -t $CI_REGISTRY/$REGISTRY_NAME/$PACKAGE_NAME:latest .
-    - docker push $CI_REGISTRY/$REGISTRY_NAME/$PACKAGE_NAME:latest
+    - mvn test
+
+package:
+  stage: package
+  image: maven:3.8.1-jdk-17
+  script:
+    - mvn package
 
 deploy:
   stage: deploy
+  image: docker:20.10.8
+  services:
+    - docker:20.10.8-dind
   script:
-    - envsubst < k8s/kustomization.tmpl.yaml k8s/kustomization.yaml
-    - kubectl kustomize k8s | kubectl apply -f -
+    - docker build -t your-docker-image-name .
+    - docker login -u your-docker-username -p your-docker-password
+    - docker push your-docker-image-name
