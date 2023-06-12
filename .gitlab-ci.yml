@@ -27,7 +27,6 @@ docker_build:
     - docker:dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - systemctl status docker
     - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
 
