@@ -1,10 +1,41 @@
+# image: maven:3.8.3-openjdk-17
+
+# variables:
+#   DOCKER_DRIVER: overlay2
+#   DOCKER_TLS_CERTDIR: ""
+#   DOCKER_HOST: tcp://localhost:2375
+
+
+# stages:
+#   - build
+#   - docker_build
+#   - deploy
+
+# cache:
+#   paths:
+#     - .m2/repository
+
+# build:
+#   stage: build
+#   script:
+#     - mvn --batch-mode package
+
+# docker_build:
+#   stage: docker_build
+#   image: docker:latest
+#   services:
+#     - docker:dind
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker build -t taewook/spring-boot-test .
+#     - docker push taewook/spring-boot-test
 image: maven:3.8.3-openjdk-17
 
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: tcp://localhost:2375
-
+  IMAGE_NAME: $CI_REGISTRY_IMAGE:latest   # 이미지 이름
 
 stages:
   - build
@@ -20,15 +51,28 @@ build:
   script:
     - mvn --batch-mode package
 
-docker_build:
-  stage: docker_build
+package:  # JOB 이름
+  # 사용될 이미지 설정
   image: docker:latest
+  # stage 설정
+  stage: package
+  # service 설정 (설정한 image가 작업이 이루어지는 동안 실행되는 docker 이미지)
   services:
     - docker:dind
+  # script가 실행 전 수행 될 script
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD   # GitLab Container Registry에 로그인
+  # 실행될 script 설정
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t taewook/spring-boot-test .
-    - docker push taewook/spring-boot-test
+    - docker build -t $IMAGE_NAME .   # Dockerfile로 build
+    - docker push $IMAGE_NAME   # Container Registry에 image push
+  # script가 실행된 후 수행 될 script
+  after_script:
+    - docker logout   # GitLab Container Registry 로그아웃
+  # JOB이 수행될 branch 설정 (설정된 branch에 push가 발생될 시 JOB 수행)
+  only:
+    - master
+
 
 deploy:
   stage: deploy
