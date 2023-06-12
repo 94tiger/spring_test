@@ -3,10 +3,8 @@ image: maven:3.8.3-openjdk-17
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
+  DOCKER_HOST: tcp://localhost:2375
 
-services:
-  - docker:20.10.8-dind
 
 stages:
   - build
@@ -17,10 +15,6 @@ cache:
   paths:
     - .m2/repository
 
-before_script:
-  - apt-get update
-  - apt-get install -y docker.io
-
 build:
   stage: build
   script:
@@ -28,10 +22,12 @@ build:
 
 docker_build:
   stage: docker_build
+  image: docker:latest
+  services:
+    - docker:dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker --version
-    - docker ps
+    - systemctl status docker
     - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
 
