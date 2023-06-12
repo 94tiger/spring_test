@@ -4,6 +4,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   #DOCKER_HOST: tcp://docker:2375
+  DOCKER_HOST: unix:///var/run/cri-dockerd.sock
   PACKAGE_NAME: kms-test
   REGISTRY_NAME: platformsi
   K8S_NAMESPACE: gitlab-agent-platformsi
