@@ -36,9 +36,9 @@ docker_build:
     # - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
 
-deploy:
-  stage: deploy
-  image: bitnami/kubectl:latest
-  script:
-    - kubectl apply -f k8s-deployment.yaml
+#deploy:
+#  stage: deploy
+#  image: bitnami/kubectl:latest
+#  script:
+#    - kubectl apply -f k8s-deployment.yaml
 
