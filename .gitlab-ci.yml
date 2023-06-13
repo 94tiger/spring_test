@@ -28,7 +28,7 @@ docker_build:
   script:
     - docker --version
     - ip addr
-    - export DOCKER_HOST=tcp://127.0.0.1:2376 && docker build -t ${CI_REGISTRY_IMAGE} .
+    - export DOCKER_HOST=tcp://127.0.0.1:2376 && docker build -t taewook/spring-boot-test .
     # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     # - docker build -t taewook/spring-boot-test .
     - docker push taewook/spring-boot-test
